@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import instance from "./axiosConfig";
+import { MdEdit, MdDelete } from "react-icons/md";
+import { FaCheck } from "react-icons/fa";
 
 function App() {
   const [input, setInput] = useState("");
@@ -21,7 +23,7 @@ function App() {
   }, []);
 
   async function fetchData() {
-    const result = await instance.get("/todos/get");
+    const result = await instance.get("/get");
     setTasks(result.data);
   }
 
@@ -32,7 +34,7 @@ function App() {
         id: idToEdit,
         title: input,
       };
-      const response = await instance.put(`/todos/edit/${idToEdit}`, obj);
+      const response = await instance.put(`/edit/${idToEdit}`, obj);
       if (response.data.message === "Todo Updated") {
         fetchData();
         setIsEditing(false);
@@ -44,7 +46,7 @@ function App() {
         title: input,
         completed: false,
       };
-      const response = await instance.post("/todos/add", obj);
+      const response = await instance.post("/add", obj);
       if (response.status === 201 && response.data.message === "Todo Saved") {
         fetchData();
       }
@@ -53,7 +55,7 @@ function App() {
   }
 
   async function handleDelete(id) {
-    const response = await instance.delete(`/todos/delete/${id}`);
+    const response = await instance.delete(`/delete/${id}`);
     if (response.data.message === "Todo Deleted") {
       fetchData();
     }
@@ -64,6 +66,13 @@ function App() {
     setInput(task.title);
     setIdToEdit(task.id);
     setIsEditing(true);
+  }
+
+  async function handleComplete(id) {
+    const response = await instance.patch(`/markComplete/${id}`);
+    if (response.data.message === "Todo Marked") {
+      fetchData();
+    }
   }
 
   return (
@@ -93,13 +102,31 @@ function App() {
         ) : tasks.length > 0 ? (
           tasks.map((task) => (
             <li
-              className="py-2 px-4 mb-2 bg-rose-400 rounded-md flex justify-between transition-all duration-300 hover:scale-[1.1]"
+              className={`py-2 px-4 mb-2 bg-rose-400 rounded-md flex justify-between ${
+                task.completed === true ? `line-through opacity-50` : ``
+              }`}
               key={task.id}
             >
               {task.title}
-              <p>
-                <button onClick={() => handleEdit(task.id)}>Edit</button>
-                <button onClick={() => handleDelete(task.id)}>Delete</button>
+              <p className="flex">
+                {!task.completed && (
+                  <MdEdit
+                    className="transition-all duration-300 hover:scale-[1.25] cursor-pointer"
+                    onClick={() => handleEdit(task.id)}
+                  />
+                )}
+
+                <MdDelete
+                  className="transition-all duration-300 hover:scale-[1.25] cursor-pointer"
+                  onClick={() => handleDelete(task.id)}
+                />
+
+                {!task.completed && (
+                  <FaCheck
+                    className="transition-all duration-300 hover:scale-[1.25] cursor-pointer"
+                    onClick={() => handleComplete(task.id)}
+                  />
+                )}
               </p>
             </li>
           ))

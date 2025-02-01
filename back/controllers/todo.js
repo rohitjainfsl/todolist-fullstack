@@ -29,3 +29,14 @@ export async function editTodo(req, res) {
   await Todo.findOneAndUpdate({ id }, { title });
   res.send({ message: "Todo Updated" });
 }
+
+export async function markTodoComplete(req, res) {
+  const id = req.params.id;
+  const { completed } = req.body;
+  const todoToUpdate = await Todo.findOne({ id });
+  const updatedTodo = await Todo.findOneAndUpdate(
+    { id },
+    { completed: !todoToUpdate.completed }
+  );
+  res.send({ message: "Todo Marked", updatedTodo: updatedTodo });
+}

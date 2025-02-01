@@ -4,6 +4,7 @@ import {
   deleteTodo,
   editTodo,
   fetchTodo,
+  markTodoComplete,
 } from "../controllers/todo.js";
 
 const todoRouter = express.Router();
@@ -15,5 +16,7 @@ todoRouter.get("/get", fetchTodo);
 todoRouter.delete("/delete/:id", deleteTodo);
 
 todoRouter.put("/edit/:id", editTodo);
+
+todoRouter.patch("/markComplete/:id", markTodoComplete);
 
 export default todoRouter;
